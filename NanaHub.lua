@@ -1,74 +1,91 @@
 -- Rayfield 読み込み
-local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+local Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/LinoriaLib/OrionLib/main/src/Orion.lua"))()
 
--- Nana Hub ウィンドウ作成（Blitz Hub風デザイン）
+-- ウィンドウ作成
 local Window = Rayfield:CreateWindow({
-    Name = "nana hub",
-    LoadingTitle = "nana hub",
-    LoadingSubtitle = "UI Study Only",
+    Name = "nyz hub",
+    LoadingTitle = "Loading nyz hub...",
+    LoadingSubtitle = "by あなたの名前",
     ConfigurationSaving = {
-        Enabled = true,
-        FolderName = "NanaHubConfig",
-        FileName = "NanaHub"
-    }
+       Enabled = true,
+       FolderName = "nyzHubConfigs",
+       FileName = "Config1"
+    },
+    Discord = {
+       Enabled = false, -- Discord 統合を使う場合 true に
+    },
+    KeySystem = false -- キー認証を付けたい場合 true に
 })
 
--- ========================
--- 🔹 Mainタブ
--- ========================
-local MainTab = Window:CreateTab("Main", 4483362458)
+-- タブ作成例
+local GrabsTab = Window:CreateTab("Grabs")
+local AntiTab = Window:CreateTab("Anti")
+local AutoTab = Window:CreateTab("Autos")
+local MiscTab = Window:CreateTab("Misc")
+local GrabLineTab = Window:CreateTab("Grab Line")
+local BlobmanTab = Window:CreateTab("Blobman")
 
--- ボタン類
-MainTab:CreateButton({Name = "Launch Object", Callback = function() print("物を飛ばすボタン（勉強用）") end})
-MainTab:CreateButton({Name = "Launch Player", Callback = function() print("プレイヤーを飛ばすボタン（勉強用）") end})
-MainTab:CreateButton({Name = "Kill All Players", Callback = function() print("全員キルボタン（勉強用）") end})
-MainTab:CreateButton({Name = "Kick Player", Callback = function() print("Kick Playerボタン（勉強用）") end})
-MainTab:CreateButton({Name = "Kill All", Callback = function() print("Kill Allボタン（勉強用）") end})
-MainTab:CreateButton({Name = "Ride Blobman", Callback = function() print("Blobmanに乗るボタン（勉強用）") end})
-MainTab:CreateButton({Name = "Blob Kick", Callback = function() print("Blob Kickボタン（勉強用）") end})
-MainTab:CreateButton({Name = "Close Hub", Callback = function() Rayfield:Destroy() end})
+-- Grabs タブのボタン例
+GrabsTab:CreateButton({
+    Name = "Grab Player",
+    Callback = function()
+        print("Grab ボタン押された")
+    end
+})
 
--- スライダー類（Speed & Jump Power）
-MainTab:CreateSlider({
-    Name = "Speed",
-    Range = {16,100},
+GrabsTab:CreateSlider({
+    Name = "Reach Distance",
+    Range = {0, 50},
     Increment = 1,
-    Suffix = " stud/s",
+    Suffix = "Studs",
+    CurrentValue = 30,
+    Flag = "ReachSlider",
+    Callback = function(Value)
+        print("Reach Distance set to "..Value)
+    end
+})
+
+GrabsTab:CreateToggle({
+    Name = "Silent Aim",
+    CurrentValue = false,
+    Flag = "SilentAimToggle",
+    Callback = function(Value)
+        print("Silent Aim: "..tostring(Value))
+    end
+})
+
+-- Auto タブのトグル例
+AutoTab:CreateToggle({
+    Name = "Auto Clutch",
+    CurrentValue = false,
+    Flag = "AutoClutchToggle",
+    Callback = function(Value)
+        print("Auto Clutch: "..tostring(Value))
+    end
+})
+
+-- Anti タブのトグル例
+AntiTab:CreateToggle({
+    Name = "Anti Grab",
+    CurrentValue = false,
+    Flag = "AntiGrabToggle",
+    Callback = function(Value)
+        print("Anti Grab: "..tostring(Value))
+    end
+})
+
+-- Misc タブのスライダー例
+MiscTab:CreateSlider({
+    Name = "Walk Speed",
+    Range = {16, 200},
+    Increment = 1,
+    Suffix = "Studs/s",
     CurrentValue = 16,
-    Flag = "SpeedFlag",
-    Callback = function(value) print("Speed変更:", value) end
+    Flag = "WalkSpeedSlider",
+    Callback = function(Value)
+        print("Walk Speed set to "..Value)
+    end
 })
 
-MainTab:CreateSlider({
-    Name = "Jump Power",
-    Range = {50,500},
-    Increment = 5,
-    Suffix = " stud",
-    CurrentValue = 50,
-    Flag = "JumpFlag",
-    Callback = function(value) print("Jump Power変更:", value) end
-})
-
--- スピードアップ・ジャンプ力ボタン（勉強用）
-MainTab:CreateButton({Name = "Apply Speed", Callback = function()
-    print("Speed適用ボタン（勉強用）:", Rayfield.Flags.SpeedFlag.Value)
-end})
-
-MainTab:CreateButton({Name = "Apply Jump", Callback = function()
-    print("Jump Power適用ボタン（勉強用）:", Rayfield.Flags.JumpFlag.Value)
-end})
-
--- トグル類（Anti系）
-MainTab:CreateToggle({Name = "Anti Grab", CurrentValue = false, Flag = "AntiGrabFlag", Callback = function(value) print("Anti Grab "..(value and "ON" or "OFF")) end})
-MainTab:CreateToggle({Name = "Anti Kick", CurrentValue = false, Flag = "AntiKickFlag", Callback = function(value) print("Anti Kick "..(value and "ON" or "OFF")) end})
-MainTab:CreateToggle({Name = "Anti Lag", CurrentValue = false, Flag = "AntiLagFlag", Callback = function(value) print("Anti Lag "..(value and "ON" or "OFF")) end})
-
--- ========================
--- 🔹 Homeタブ（整理用）
--- ========================
-local HomeTab = Window:CreateTab("Home", 4483362458)
-HomeTab:CreateButton({Name = "Welcome Message", Callback = function() print("Welcomeボタン（勉強用）") end})
-HomeTab:CreateButton({Name = "About Hub", Callback = function() print("About Hubボタン（勉強用）") end})
-HomeTab:CreateSlider({Name = "Dummy Slider", Range = {0,10}, Increment = 1, Suffix = "", CurrentValue = 0, Flag = "DummyFlag", Callback = function(value) print("Dummy Slider:", value) end})
-HomeTab:CreateToggle({Name = "Dummy Toggle", CurrentValue = false, Flag = "DummyToggleFlag", Callback = function(value) print("Dummy Toggle "..(value and "ON" or "OFF")) end})
-
+-- Rayfield UI 初期化完了
+print("nyz hub UI loaded successfully!")
