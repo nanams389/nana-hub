@@ -5,18 +5,18 @@ local PS = game:GetService("Players")
 local DB = game:GetService("Debris")
 local Tween = game:GetService("TweenService")
 local uis = game:GetService("UserInputService")
-local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/BlizTBr/scripts/main/Orion%20X')))()
 local R = game:GetService("RunService")
-local request = (syn and syn.request) or http and http.request or http_request or (fluxus and fluxus.request) or request
 local W = game:GetService("Workspace")
 local Cam = workspace.CurrentCamera
+
+local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/BlizTBr/scripts/main/Orion%20X'))()
+local request = (syn and syn.request) or http and http.request or http_request or (fluxus and fluxus.request) or request
+
 local downDir = Vector3.new(0, -1, 0)
 local lastH
 local lastHitTime = tick()
 local raycastParams = RaycastParams.new()
-local xcl
-local ycl
-local zcl
+local xcl, ycl, zcl
 local offPos = Vector3.new(xcl, ycl, zcl)
 local freeze
 local frt
@@ -83,8 +83,7 @@ _G.WalkA = nil
 _G.Jpower = nil
 _G.BSpeed = nil
 
--- Functions
-
+-- Check Campfire
 local function checkFirePart()
     for i, toy in pairs(localTFolder:GetChildren()) do
         if toy.Name == "Campfire" then
@@ -109,7 +108,7 @@ local function checkFirePart()
         local args = {
             [1] = "Campfire",
             [2] = CFrame.new(508.073517, 67.2614441, -261.901917, -0.133750245, -0.471861839, 0.871468484, -3.7252903e-09, 0.879369617, 0.476139903, -0.991015136, 0.0636838302, -0.117615893),
-            [3] = Vector3.new(0, 97.69000244140625, 0)
+            [3] = Vector3.new(0, 97.69, 0)
         }
 
         repeat
@@ -126,22 +125,17 @@ local function checkFirePart()
                         end
                     end
                 end
-
-                if campfire then
-                    break
-                end
+                if campfire then break end
             else
                 campfire = localTFolder:FindFirstChild("Campfire")
             end
-
             wait(1)
         until campfire ~= nil
-
         return campfire
     end
 end
 
--- 改名：NightHub -> NanaHub
+-- NanaHub
 local function NanaHub()
     -- Anti-burn setup
     local anfr = W.Map.Hole.PoisonBigHole.ExtinguishPart
@@ -149,77 +143,56 @@ local function NanaHub()
     anfr.Transparency = 1
     anfr.Tex.Transparency = 1
 
+    -- Silent Aim / Targeting
     local function STS()
-        local Hitbox = {"Head", "Torso", "Left Leg", "Right Leg"}
+        local Hitbox = {"Head","Torso","Left Leg","Right Leg"}
 
         local function GetClosest()
             local Target, Closest = nil, math.huge
-
             for _, player in pairs(PS:GetPlayers()) do
-                if player.Name ~= localPlayer.Name and player.Character and localPlayer and localPlayer.Character and localPlayer.Character.HumanoidRootPart then
-                    local playerPosition = localPlayer.Character.HumanoidRootPart.Position
-                    local humanoidRootPart = player.Character:FindFirstChild("HumanoidRootPart")
-
-                    if humanoidRootPart then
-                        local screenPos, onScreen = Cam:WorldToScreenPoint(humanoidRootPart.Position)
-
-                        if onScreen then
-                            local distance = (playerPosition - humanoidRootPart.Position).magnitude
-
-                            if distance < Closest then
-                                Closest = distance
-                                Target = player
-                            end
-                        end
+                if player.Name ~= localPlayer.Name and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                    local distance = (localPlayer.Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).magnitude
+                    if distance < Closest then
+                        Closest = distance
+                        Target = player
                     end
                 end
             end
-
             return Target
         end
 
-        local Target
-        local part
-        local partn
-        local ch
-
+        local Target, part, partn, ch
         R.RenderStepped:Connect(function()
             Target = GetClosest()
         end)
 
         local function CalculateDirection(Origin, Destination, Length)
-            return (Destination - Origin).Unit * Length
+            return (Destination-Origin).Unit*Length
         end
 
         local __namecall
-        __namecall = hookmetamethod(game, "__namecall", function(...)
+        __namecall = hookmetamethod(game,"__namecall",function(...)
             local args = {...}
             local self = args[1]
             local method = getnamecallmethod()
-
-            if self == workspace and not checkcaller() and method == "Raycast" and Target and Target.Character and Target.Character.HumanoidRootPart and localPlayer.Character.HumanoidRootPart and Target.Character.Humanoid and Target.Character.Humanoid.Health > 0 and not Target.InPlot.Value and SIL then
-                local playerPosition = localPlayer.Character.HumanoidRootPart.Position
-                local targetPosition = Target.Character.HumanoidRootPart.Position
-                local distance = (playerPosition - targetPosition).magnitude
-                part = math.random(1, #Hitbox)
+            if self == workspace and not checkcaller() and method=="Raycast" and Target and Target.Character and Target.Character:FindFirstChild("HumanoidRootPart") and localPlayer.Character:FindFirstChild("HumanoidRootPart") and SIL then
+                local distance = (localPlayer.Character.HumanoidRootPart.Position-Target.Character.HumanoidRootPart.Position).magnitude
+                part = math.random(1,#Hitbox)
                 partn = Hitbox[part]
                 ch = Target.Character[partn]
-
                 if distance <= dist and ch then
-                    args[3] = CalculateDirection(args[2], Target.Character[partn].Position, 1000)
+                    args[3] = CalculateDirection(args[2],ch.Position,1000)
                     args[4] = RaycastParams.new()
                     args[4].FilterDescendantsInstances = {Target.Character}
                     args[4].FilterType = Enum.RaycastFilterType.Include
-                    part = nil
-                    partn = nil
-                    ch = nil
+                    part=nil partn=nil ch=nil
                 end
             end
-
             return __namecall(unpack(args))
         end)
     end
 
+    -- Window
     local Window = OrionLib:MakeWindow({
         Name = "nana hub(FTAP)",
         HidePremium = false,
@@ -230,13 +203,42 @@ local function NanaHub()
         ConfigFolder = "NanaHubConfig"
     })
 
-    -- 以下、NightHub内のタブや設定もそのままコピー
-    -- Grabs, Anti, Autos, Misc, Grab Line, Blobman タブなど
-    -- 省略しても構造は同じ
+    -- Tabs
+    local GrabsTab = Window:MakeTab({Name="Grabs"})
+    local AntiTab = Window:MakeTab({Name="Anti"})
+    local AutoTab = Window:MakeTab({Name="Autos"})
+    local MiscTab = Window:MakeTab({Name="Misc"})
+    local GrabLineTab = Window:MakeTab({Name="Grab Line"})
+    local BlobmanTab = Window:MakeTab({Name="Blobman"})
 
+    -- Grabs Tab
+    GrabsTab:AddSlider({
+        Name="Reach Silent Aim",
+        Min=0, Max=50, Default=30,
+        Callback=function(Value) dist=Value end
+    })
+    GrabsTab:AddToggle({
+        Name="Silent Aim", Default=false,
+        Callback=function(Value) SIL=Value end
+    })
+
+    -- Autos Tab
+    AutoTab:AddToggle({Name="Auto Clutch", Default=false, Callback=function(Value) autocl=Value end})
+    AutoTab:AddToggle({Name="Freeze Toggle(Auto Clutch)", Default=false, Callback=function(Value) freeze=Value end})
+    AutoTab:AddSlider({Name="Freeze Delay(Auto Clutch)", Min=1, Max=10, Default=5, Callback=function(Value) frt=Value end})
+    AutoTab:AddSlider({Name="X Axis(Auto Clutch)", Min=-5, Max=5, Default=-3, Callback=function(Value) xcl=Value end})
+    AutoTab:AddSlider({Name="Y Axis(Auto Clutch)", Min=0, Max=5, Default=1, Callback=function(Value) ycl=Value end})
+    AutoTab:AddSlider({Name="Z Axis(Auto Clutch)", Min=-5, Max=5, Default=0, Callback=function(Value) zcl=Value end})
+
+    -- Misc Tab
+    AutoTab:AddParagraph("Important!","Don't edit the values below if you don't know what you are doing.")
+
+    -- Start Silent Aim
     STS()
+
+    -- Init UI
     OrionLib:Init()
 end
 
--- 改名後の呼び出し
+-- Start NanaHub
 NanaHub()
