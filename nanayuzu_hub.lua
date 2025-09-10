@@ -188,3 +188,77 @@ CreditsTab:CreateLabel("Made by YourName")
 CreditsTab:CreateLabel("Inspired by Blitz Hub")
 
 Rayfield:Init()
+
+-- ====================
+-- Player Selection Dropdown
+-- ====================
+local playerDropdown = {}
+for i, plr in pairs(Players:GetPlayers()) do
+    if plr ~= LocalPlayer then
+        table.insert(playerDropdown, plr.Name)
+    end
+end
+
+local selectedPlayerName = playerDropdown[1] -- 初期値
+
+PlayerTab:CreateDropdown({
+    Name = "Select Player",
+    Options = playerDropdown,
+    CurrentOption = selectedPlayerName,
+    Callback = function(option)
+        selectedPlayerName = option
+    end
+})
+
+-- 既存のボタンを選択プレイヤー対応に置き換え
+PlayerTab:CreateButton({
+    Name = "Teleport to Player",
+    Callback = function()
+        local target = Players:FindFirstChild(selectedPlayerName)
+        if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+            HR.CFrame = target.Character.HumanoidRootPart.CFrame
+        end
+    end
+})
+
+PlayerTab:CreateButton({
+    Name = "Bring Player to Me",
+    Callback = function()
+        local target = Players:FindFirstChild(selectedPlayerName)
+        if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+            target.Character.HumanoidRootPart.CFrame = HR.CFrame
+        end
+    end
+})
+
+PlayerTab:CreateButton({
+    Name = "Kill Player",
+    Callback = function()
+        local target = Players:FindFirstChild(selectedPlayerName)
+        if target and target.Character and target.Character:FindFirstChild("Humanoid") then
+            target.Character.Humanoid.Health = 0
+        end
+    end
+})
+
+-- 新規: バリアを付与するボタン
+PlayerTab:CreateButton({
+    Name = "Give Barrier to Player",
+    Callback = function()
+        local target = Players:FindFirstChild(selectedPlayerName)
+        if target and target.Character then
+            local hrp = target.Character:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                local barrier = Instance.new("Part")
+                barrier.Size = Vector3.new(5,5,5)
+                barrier.Transparency = 0.5
+                barrier.Anchored = true
+                barrier.CanCollide = true
+                barrier.Position = hrp.Position
+                barrier.Name = "Barrier"
+                barrier.Parent = Workspace
+                game:GetService("Debris"):AddItem(barrier, 5) -- 5秒で消える
+            end
+        end
+    end
+})
